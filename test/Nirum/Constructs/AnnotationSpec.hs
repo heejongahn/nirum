@@ -92,7 +92,6 @@ spec = do
             A.lookupDocs empty `shouldBe` Nothing
         describe "insertDocs" $ do
             it "should insert the doc comment as an annotation" $
-                A.insertDocs "yay" empty `shouldReturn`
-                    AnnotationSet [("docs", Just "yay\n")]
+                A.insertDocs "yay" empty `shouldBe` (Right $ AnnotationSet [("docs", Just "yay\n")])
             it "should fail on the annotation that already have a doc" $
-                A.insertDocs "yay" annotationSet `shouldThrow` anyException
+                A.insertDocs "yay" annotationSet `shouldBe` (Left $ AnnotationNameDuplication "docs")

@@ -76,11 +76,13 @@ lookupDocs annotationSet = do
     data' <- m
     return $ Docs data'
 
-insertDocs :: (Monad m) => Docs -> AnnotationSet -> m AnnotationSet
+insertDocs :: Docs -> AnnotationSet -> Either NameDuplication AnnotationSet
 insertDocs docs' (AnnotationSet anno) =
     case insertLookup annotationDocsName (Just $ toText docs') anno of
-        (Just _ , _) -> fail "<duplicated>"
-        (Nothing, anno') -> return $ AnnotationSet anno'
-  where
-    insertLookup :: Ord k => k -> a -> M.Map k a -> (Maybe a, M.Map k a)
-    insertLookup = M.insertLookupWithKey $ \ _ a _ -> a
+        (Just _, _) ->
+            Left $ AnnotationNameDuplication "docs"
+        (Nothing, anno') ->
+            Right $ AnnotationSet anno'
+    where
+      insertLookup :: Ord k => k -> a -> M.Map k a -> (Maybe a, M.Map k a)
+      insertLookup = M.insertLookupWithKey $ \ _ a _ -> a

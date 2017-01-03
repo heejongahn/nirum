@@ -242,11 +242,13 @@ docs = do
         ) (eol >> spaces) <?> "comments"
     return $ Docs $ T.unlines comments
 
-annotationsWithDocs :: Monad m
-                    => A.AnnotationSet
+annotationsWithDocs :: A.AnnotationSet
                     -> Maybe Docs
-                    -> m A.AnnotationSet
-annotationsWithDocs set' (Just docs') = A.insertDocs docs' set'
+                    -> Parser A.AnnotationSet
+annotationsWithDocs set' (Just docs') =
+    case A.insertDocs docs' set' of
+        Right anno' -> return anno'
+        Left _ -> fail "duplicated docs"
 annotationsWithDocs set' Nothing = return set'
 
 aliasTypeDeclaration :: Parser TypeDeclaration
